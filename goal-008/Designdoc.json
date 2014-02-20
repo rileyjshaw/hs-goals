@@ -1,0 +1,11 @@
+Creature {
+  constants {
+    edible: 0, // 0 means that it is inedible, # represents energy needed to eat it
+    maxEnergy: 0, // can be whatever
+    color: [125, 123, 206], // rgb from 0 - 255, will be multiplied by energy
+  }
+  variables {
+    energy: 0, // will die if 0
+    direction: 'sw' // maybe change this
+  }
+}

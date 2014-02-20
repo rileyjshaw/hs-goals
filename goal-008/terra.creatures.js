@@ -2,10 +2,12 @@
 
   // Imports...
   randomElement = terra.util.randomElement;
-  creatureTypes = terra.util.creatureTypes;
+  registerCreatureType = terra.util.registerCreatureType;
+  findDirections = terra.util.findDirections;
+  directions = terra.util.directions;
 
   function Wall () {}
-  creatureTypes.register( Wall, '#' );
+  registerCreatureType( Wall, '#' );
 
   function Lichen () {
     this.energy = 5;
@@ -27,7 +29,7 @@
       };
     }
   };
-  creatureTypes.register( Lichen, '*' );
+  registerCreatureType( Lichen, '*' );
 
   function LineBug () {
     this.energy = 10;
@@ -57,7 +59,7 @@
       };
     }
   };
-  creatureTypes.register( LineBug, 'c' );
+  registerCreatureType( LineBug, 'c' );
 
   function StupidBug () {
     this.energy = 10;
@@ -86,6 +88,6 @@
       };
     }
   };
-  creatureTypes.register( StupidBug, 'C' );
+  registerCreatureType( StupidBug, 'C' );
 
 })( terra.creatures = terra.creatures || {} );

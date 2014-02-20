@@ -10,7 +10,7 @@ terra.create = function ( selector, map, fps ) {
   }
 
   map = map || terra.maps.mSmall( [ '*', 'C', ' ', '#' ] );
-  fps = fps || 60;
+  fps = fps || 1000; //60;
 
   /*    startTick: function(fn) {
         var tick = function() {

@@ -49,17 +49,16 @@
     return level;
   };
 
-
   exports.mBasic = mBasic;
   exports.mMoodyCave = mMoodyCave;
   exports.mSmall = function ( characters ) {
-    return mapGen( 24, 48, characters );
+    return mapGen( 48, 24, characters );
   };
   exports.mMedium = function ( characters ) {
-    return mapGen( 48, 96, characters );
+    return mapGen( 96, 48, characters );
   };
   exports.mBig = function ( characters ) {
-    return mapGen( 180, 60, characters );
+    return mapGen( 60, 180, characters );
   };
   exports.mapGen = mapGen;
 

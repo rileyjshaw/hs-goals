@@ -92,7 +92,7 @@ var terra = terra || {};
   var creatureTypes = new Dictionary();
   creatureTypes.register = function ( constructor, character ) {
     constructor.prototype.character = character;
-    this.store( character, constructor );
+    creatureTypes.store( character, constructor ); // FIXME: could use method() or bind() rather than creatureTypes
   };
 
   function Point ( x, y ) {
@@ -145,10 +145,10 @@ var terra = terra || {};
     var width = map[ 0 ].length;
     var height = map.length;
     var grid = new Grid( width, height );
-    for ( var y = 0; y < height; y++ ) {
-      var line = map[ y ];
-      for ( var x = 0; x < width; x++ ) {
-        grid.setValueAt( new Point( x, y ), elementFromCharacter( line.charAt( x ) ) );
+    for ( var row = 0; row < height; row++ ) {
+      var line = map[ row ];
+      for ( var column = 0; column < width; column++ ) {
+        grid.setValueAt( new Point( column, row ), elementFromCharacter( line.charAt( column ) ) );
       }
     }
     this.grid = grid;
@@ -318,6 +318,8 @@ var terra = terra || {};
 
   exports.randomElement = randomElement;
   exports.Terrarium = Terrarium;
-  exports.creatureTypes = creatureTypes;
+  exports.registerCreatureType = creatureTypes.register;
+  exports.findDirections = findDirections;
+  exports.directions = directions;
 
 })( terra.util = terra.util || {} );

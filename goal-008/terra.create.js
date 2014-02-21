@@ -1,6 +1,6 @@
 // consider changing name, adding ability to pause, reset, etc.
 
-terra.create = function ( selector, map, fps ) {
+terra.create = function ( selector, map ) {
 
   // Imports...
   Terrarium = terra.util.Terrarium;
@@ -10,25 +10,21 @@ terra.create = function ( selector, map, fps ) {
   }
 
   map = map || terra.maps.mSmall( [ '*', 'C', ' ', '#' ] );
-  fps = fps || 1000; //60;
 
-  /*    startTick: function(fn) {
-        var tick = function() {
-          fn();
-          requestAnimationFrame(tick);
-        };
+  var startTick = function ( fn ) {
+    var tick = function () {
+      fn();
+      requestAnimationFrame( tick );
+    };
 
-        requestAnimationFrame(tick);
-      },
-  */
+    requestAnimationFrame( tick );
+  }
 
-  var period = 1000 / fps;
-  var domElement = document.querySelector( selector );
-  var level = new Terrarium( map );
+  var level = new Terrarium( map, selector );
 
-  var loop = setInterval( function() {
-    domElement.innerHTML = level.toString();
+  startTick( function () {
     level.step();
-  }, period );
+    level.toDom();
+  });
 
 };

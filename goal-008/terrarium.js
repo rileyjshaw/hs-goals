@@ -132,7 +132,10 @@ var terra = terra || {};
     }
   };
 
-  function Terrarium ( map ) {
+  function Terrarium ( map, selector ) {
+    // FIXME: Grid / DOM logic should probably be broken out of here...
+
+    var domElement = document.querySelector( selector );
     var width = map[ 0 ].length;
     var height = map.length;
     var grid = new Grid( width, height );
@@ -144,22 +147,46 @@ var terra = terra || {};
       }
     }
     this.grid = grid;
+
+    var docFragment = document.createDocumentFragment();
+
+    for ( var i = width * height; i >= 0; i-- ) {
+      var span = document.createElement("span");
+      if ( i % width === 0 ) {
+        span.style.clear = 'left';
+      }
+      docFragment.appendChild(span);
+    }
+
+    domElement.innerHTML = '';
+    domElement.appendChild(docFragment);
+    this.spans = domElement.childNodes;
+
   }
 
   Terrarium.prototype.toString = function () {
     var characters = [];
     var endOfLine = this.grid.width - 1;
     this.grid.each( function ( point, value ) {
-      if ( value !== undefined ) {
-        characters.push( '<span style = "color: rgb(' + value.currentColor + ')">' + characterFromElement( value ) + '</span>' );
-      } else {
-        characters.push( characterFromElement( value ) );
-      }
+      characters.push( characterFromElement( value ) );
       if ( point.x === endOfLine ) {
         characters.push( '\n' );
       }
     });
     return characters.join( '' );
+  };
+
+  Terrarium.prototype.toDom = function () {
+    var terra = this;
+    this.grid.each( function ( point, value ) {
+      var span = terra.spans[ point.y * terra.grid.width + point.x ];
+      if ( value ) {
+        span.style.color = 'rgb(' + value.currentColor + ')';
+        span.textContent = characterFromElement( value );
+      } else {
+        span.textContent = ' ';
+      }
+    });
   };
 
   Terrarium.prototype.listActingCreatures = function () {
@@ -181,9 +208,15 @@ var terra = terra || {};
     directions.each( function ( name, direction ) {
       var place = center.add( direction );
       if ( grid.isInside( place ) ) {
-        result[ name ] = characterFromElement( grid.cells[ place.y ][ place.x ] );
+        result[ name ] = {
+          character: characterFromElement( grid.cells[ place.y ][ place.x ] ),
+          object: grid.cells[ place.y ][ place.x ]
+        };
       } else {
-        result[ name ] = '#';
+        result[ name ] = {
+          character: '#',
+          object: null
+        };
       }
     });
     return result;
@@ -238,12 +271,16 @@ var terra = terra || {};
       case 'wait':
         energy = 0.4 * ( creature.object.moveCost || -1 );
         break;
+      case 'skip':
+        break;
       default:
         throw new Error( 'Unsupported action: ' + action.type);
     }
 
-    if ( ( creature.object.energy += energy ) <= 0 ) {
+    if ( action.type !== 'skip' && ( creature.object.energy += energy ) <= 0 ) {
       this.grid.cells[ creature.point.y ][ creature.point.x ] = undefined;
+    } else if ( creature.object.energy > creature.object.maxEnergy ) {
+      creature.object.energy = creature.object.maxEnergy;
     }
   };
 
@@ -302,7 +339,7 @@ var terra = terra || {};
   function findDirections ( surroundings, wanted ) {
     var found = [];
     directions.each( function ( name ) {
-      if ( surroundings[ name ] == wanted ) {
+      if ( surroundings[ name ].character == wanted ) {
         found.push( name );
       }
     });

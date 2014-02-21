@@ -24,8 +24,11 @@ lichen: 5 - 20
 L:
 l:
 
-move
-eat
-photosynthesize
-reproduce
-wait
+Being? Entity? : {
+  photosynthesize
+  reproduce
+  wait
+  Creature: {
+    move
+    eat
+

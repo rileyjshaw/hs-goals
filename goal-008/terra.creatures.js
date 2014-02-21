@@ -10,7 +10,7 @@
   function Wall () {
     this.currentColor = [];
   }
-  Wall.prototype.color = [ 255, 255, 255 ];
+  Wall.prototype.color = [ 0, 0, 0 ];
   registerCreatureType( Wall, '#' );
 
   function Lichen () {
@@ -19,6 +19,7 @@
   }
   Lichen.prototype.color = [ 0, 255, 0 ];
   Lichen.prototype.maxEnergy = 20;
+  Lichen.prototype.efficiency = 0.5;
 
   Lichen.prototype.act = function ( surroundings ) {
     var emptySpace = findDirections( surroundings, ' ' );
@@ -36,16 +37,16 @@
   registerCreatureType( Lichen, '*' );
 
   function LineBug () {
-    this.energy = 10;
+    this.energy = 8;
     this.direction = 'ne';
     this.currentColor = [];
   }
   LineBug.prototype.color = [ 0, 0, 255 ];
   LineBug.prototype.maxEnergy = 50;
-  LineBug.prototype.moveCost = -1.5;
+  LineBug.prototype.moveCost = -2;
 
   LineBug.prototype.act = function ( surroundings ) {
-    var emptySpace = findDirections( surroundings, ' ' );
+    var emptySpace = findDirections( surroundings, ' ' ); // FIXME: just needs the one direction
     var lichen = findDirections( surroundings, '*' );
     if ( this.energy >= 30 && emptySpace.length > 0 ) {
       return {
@@ -105,7 +106,7 @@
 
   // Example of a bug that doesn't depend on standard actions
   function GameOfLifeBug () {
-    this.energy = Math.random() < 0.5 ? 0 : 1;
+    this.energy = 1; //Math.random() < 0.5 ? 0 : 1;
     this.currentColor = [];
   }
   GameOfLifeBug.prototype.color = [ 0, 0, 0 ];
@@ -113,8 +114,12 @@
 
   GameOfLifeBug.prototype.act = function( surroundings ) {
     var numNeighbors = 0;
-    var neighbors = findDirections( surroundings, this.character ).length;
-
+    directions.each( function ( name ) {
+      if ( surroundings[ name ].character === this.character
+          && surroundings[ name ].object.energy === 1 ) {
+        numNeighbors++;
+      }
+    });
     if ( this.energy ) {
       if ( !( numNeighbors === 2 || numNeighbors === 3 ) ) {
         this.energy = 0;
@@ -122,6 +127,9 @@
     } else if ( numNeighbors === 3 ) {
       this.energy = 1;
     }
+    return {
+      type: 'skip'
+    };
   };
   registerCreatureType( GameOfLifeBug, 'L' );
 

@@ -111,16 +111,11 @@ var terra = terra || {};
   function Grid ( width, height ) {
     this.width = width;
     this.height = height;
-    this.cells = new Array( width * height );
+    this.cells = new Array( height );
+    for ( var i = height - 1; i >= 0; i++) {
+      this.cells[ i ] = new Array( width );
+    }
   }
-
-  Grid.prototype.valueAt = function ( point ) {
-    return this.cells [ point.y * this.width + point.x ];
-  };
-
-  Grid.prototype.setValueAt = function ( point, value ) {
-    this.cells [ point.y * this.width + point.x ] = value;
-  };
 
   Grid.prototype.isInside = function ( point ) {
     return point.x >= 0 && point.y >= 0 &&
@@ -128,15 +123,15 @@ var terra = terra || {};
   };
 
   Grid.prototype.moveValue = function ( from, to ) {
-    this.setValueAt( to, this.valueAt( from ));
-    this.setValueAt( from, undefined);
+    this.cells[ to.y ][ to.x ] = this.cells[ from.y ][ from.x ];
+    this.cells[ from.y ][ from.x ] = undefined;
   };
 
   Grid.prototype.each = function ( action ) {
     for ( var y = 0; y < this.height; y++ ) {
       for ( var x = 0; x < this.width; x++ ) {
         var point = new Point( x, y );
-        action( point, this.valueAt( point ) );
+        action( point, this.cells[ y ][ x ] );
       }
     }
   };
@@ -148,7 +143,8 @@ var terra = terra || {};
     for ( var row = 0; row < height; row++ ) {
       var line = map[ row ];
       for ( var column = 0; column < width; column++ ) {
-        grid.setValueAt( new Point( column, row ), elementFromCharacter( line.charAt( column ) ) );
+        var p = new Point( column, row );
+        grid.cells[ p.y ][ p.x ] = elementFromCharacter( line[ column ] );
       }
     }
     this.grid = grid;
@@ -185,24 +181,12 @@ var terra = terra || {};
     directions.each( function ( name, direction ) {
       var place = center.add( direction );
       if ( grid.isInside( place ) ) {
-        result[ name ] = characterFromElement( grid.valueAt( place ) );
+        result[ name ] = characterFromElement( grid.cells[ place.y ][ place.x ] );
       } else {
         result[ name ] = '#';
       }
     });
     return result;
-  };
-
-  Terrarium.prototype.processCreature = function ( creature ) {
-    var action = creature.object.act( this.listSurroundings( creature.point ) );
-    if ( action.type == 'move' && directions.contains( action.direction ) ) {
-      var to = creature.point.add( directions.lookup( action.direction ) );
-      if ( this.grid.isInside( to ) && this.grid.valueAt( to ) === undefined) {
-        this.grid.moveValue( creature.point, to );
-      }
-    } else {
-      throw new Error( 'Unsupported action: ' + action.type );
-    }
   };
 
   Terrarium.prototype.step = function () {
@@ -248,44 +232,57 @@ var terra = terra || {};
         throw new Error( 'Unsupported action: ' + action.type);
     }
 
-    creature.object.energy -= energy;
-    if ( creature.object.energy <= 0 ) {
-      this.grid.setValueAt( creature.point, undefined);
+    var currentEnergy = creature.object.energy += energy;
+    if ( currentEnergy <= 0 ) {
+      this.grid.cells[ creature.point.y ][ creature.point.x ] = undefined;
+    } else {
+      var color = creature.object.color;
+      var maxEnergy = creature.object.maxEnergy;
+      for ( var i = 2; i >= 0; i--) {
+        creature.object.currentColor[ i ] = color + 255 * ( maxEnergy / currentEnergy - 1 );
+      }
     }
   };
 
   Terrarium.prototype.creatureMove = function ( creature, from, to ) {
-    if ( to !== null && this.grid.valueAt( to ) === undefined ) {
+    if ( to !== null && this.grid.cells[ to.y ][ to.x ] === undefined ) {
       this.grid.moveValue( from, to );
       from.x = to.x;
       from.y = to.y;
     }
-    return creature.moveCost || 1;
+    return -creature.moveCost || -1;
   };
 
   Terrarium.prototype.creatureEat = function ( creature, source ) {
-    var energy = 1;
+    var energy = creature.moveCost || 1;
     if ( source !== null ) {
-      var meal = this.grid.valueAt( source );
-      if ( meal !== undefined && meal.energy ) {
-        this.grid.setValueAt( source, undefined );
-        energy -= meal.energy;
+      var meal = this.grid.cells[ source.y ][ source.x ];
+      if ( meal !== undefined ) {
+        var creatureHunger = creature.maxEnergy - creature.energy;
+        var mealEnergy = meal.energy;
+        if ( mealEnergy > creatureHunger) {
+          meal.energy -= creatureHunger;
+          energy = creatureHunger;
+        } else {
+          energy = mealEnergy;
+          this.grid.cells[ source.y ][ source.x ] = undefined;
+        }
       }
     }
-    return energy;
+    return energy * ( creature.efficiency || 1 );
   };
 
   Terrarium.prototype.creatureReproduce = function ( creature, target ) {
     var energy = 1;
-    if ( target !== null && this.grid.valueAt( target ) === undefined ) {
+    if ( target !== null && this.grid.cells[ target.y ][ target.x ] === undefined ) {
       var species = characterFromElement( creature );
       var baby = elementFromCharacter( species );
       energy = baby.energy * 2;
       if ( creature.energy >= energy ) {
-        this.grid.setValueAt( target, baby );
+        this.grid.cells[ target.y ][ target.x ] = baby;
       }
     }
-    return energy;
+    return -energy * ( creature.efficiency || 1 );
   };
 
   function elementFromCharacter ( character ) {
@@ -321,5 +318,6 @@ var terra = terra || {};
   exports.registerCreatureType = creatureTypes.register;
   exports.findDirections = findDirections;
   exports.directions = directions;
+  exports.forEach = forEach;
 
 })( terra.util = terra.util || {} );

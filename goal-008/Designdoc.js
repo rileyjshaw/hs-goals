@@ -8,7 +8,7 @@ Creature {
     color: [125, 123, 206], // rgb from 0 - 255, will be multiplied by energy
     character: 'x', // needs to be collected somewhere
     moveCost: 1, // how much energy is expended on movement
-    efficiency: .8, // number from 0 -> 1 determining energy conversion after consumption
+    efficiency: .8, // number from 0 -> 1 determining energy conversion after consumption (during eat or photosynthesize)
 
   },
   instance {
@@ -16,3 +16,16 @@ Creature {
     direction: 'sw' // maybe change this
   }
 }
+
+lichen: 5 - 20
+?
+?
+
+L:
+l:
+
+move
+eat
+photosynthesize
+reproduce
+wait

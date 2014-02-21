@@ -73,7 +73,18 @@ Tracking my goals and progress through Hacker School W'14.
 
 **Planned completion date:** February 21
 
-**Completion date:** ??
+**Completion date:** February 20
+
+## [Goal 009](/goal-008) {#goal009}
+*"Revise the terrarium storage structures to optamize for data analysis / get colors working"*
+
+**Start Date:** February 20
+
+**Planned Completion Date:** February 21
+
+**Completion Date:** February 21
+
+***Note:* This was placed in the [goal-008 ](/goal-008) folder, as it's just incremental changes.
 
 ## [Goal ???]
 *"Create a trivia game that diaplays questions on a laptop browser and allows 4 players to use their mobile browsers as controllers"*

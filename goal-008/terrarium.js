@@ -261,15 +261,8 @@ var terra = terra || {};
     if ( source !== null ) {
       var meal = this.grid.cells[ source.y ][ source.x ];
       if ( meal !== undefined ) {
-        var creatureHunger = creature.maxEnergy - creature.energy;
-        var mealEnergy = meal.energy;
-        if ( mealEnergy > creatureHunger) {
-          meal.energy -= creatureHunger;
-          energy = creatureHunger;
-        } else {
-          energy = mealEnergy;
-          this.grid.cells[ source.y ][ source.x ] = undefined;
-        }
+        energy = meal.energy;
+        this.grid.cells[ source.y ][ source.x ] = undefined;
       }
     }
     return energy * ( creature.efficiency || 1 );

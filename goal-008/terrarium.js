@@ -104,15 +104,11 @@ var terra = terra || {};
     return new Point( this.x + other.x, this.y + other.y );
   };
 
-  Point.prototype.toString = function () {
-    return '(' + this.x + ',' + this.y + ')';
-  };
-
   function Grid ( width, height ) {
     this.width = width;
     this.height = height;
     this.cells = new Array( height );
-    for ( var i = height - 1; i >= 0; i++) {
+    for ( var i = height - 1; i >= 0; i--) {
       this.cells[ i ] = new Array( width );
     }
   }
@@ -144,7 +140,7 @@ var terra = terra || {};
       var line = map[ row ];
       for ( var column = 0; column < width; column++ ) {
         var p = new Point( column, row );
-        grid.cells[ p.y ][ p.x ] = elementFromCharacter( line[ column ] );
+        grid.cells[ row ][ column ] = elementFromCharacter( line[ column ] );
       }
     }
     this.grid = grid;
@@ -154,7 +150,11 @@ var terra = terra || {};
     var characters = [];
     var endOfLine = this.grid.width - 1;
     this.grid.each( function ( point, value ) {
-      characters.push( characterFromElement( value ) );
+      if ( value !== undefined ) {
+        characters.push( '<span style = "color: rgb(' + value.currentColor + ')">' + characterFromElement( value ) + '</span>' );
+      } else {
+        characters.push( characterFromElement( value ) );
+      }
       if ( point.x === endOfLine ) {
         characters.push( '\n' );
       }
@@ -195,7 +195,12 @@ var terra = terra || {};
 
   Terrarium.prototype.processCreature = function ( creature ) {
     var
+    i,
     energy,
+    currentEnergy = creature.object.energy,
+    maxEnergy = creature.object.maxEnergy,
+    color = creature.object.color,
+    rgbSegment,
     action,
     self = this;
 
@@ -210,6 +215,11 @@ var terra = terra || {};
       return target;
     }
 
+    for ( i = 2; i >= 0; i--) {
+      rgbSegment = color[ i ];
+      creature.object.currentColor[ i ] = Math.floor( rgbSegment + (255 - rgbSegment) * ( 1 - currentEnergy / maxEnergy ) );
+    }
+
     action = creature.object.act( this.listSurroundings( creature.point ) );
 
     switch ( action.type ) {
@@ -220,27 +230,20 @@ var terra = terra || {};
         energy = this.creatureEat( creature.object, dir() );
         break;
       case 'photosynthesize':
-        energy = -1;
+        energy = 2 * ( creature.object.efficiency || 1 );
         break;
       case 'reproduce':
         energy = this.creatureReproduce( creature.object, dir() );
         break;
       case 'wait':
-        energy = 0.2;
+        energy = 0.4 * ( creature.object.moveCost || -1 );
         break;
       default:
         throw new Error( 'Unsupported action: ' + action.type);
     }
 
-    var currentEnergy = creature.object.energy += energy;
-    if ( currentEnergy <= 0 ) {
+    if ( ( creature.object.energy += energy ) <= 0 ) {
       this.grid.cells[ creature.point.y ][ creature.point.x ] = undefined;
-    } else {
-      var color = creature.object.color;
-      var maxEnergy = creature.object.maxEnergy;
-      for ( var i = 2; i >= 0; i--) {
-        creature.object.currentColor[ i ] = color + 255 * ( maxEnergy / currentEnergy - 1 );
-      }
     }
   };
 
@@ -250,11 +253,11 @@ var terra = terra || {};
       from.x = to.x;
       from.y = to.y;
     }
-    return -creature.moveCost || -1;
+    return creature.moveCost || -1;
   };
 
   Terrarium.prototype.creatureEat = function ( creature, source ) {
-    var energy = creature.moveCost || 1;
+    var energy = creature.moveCost || -1;
     if ( source !== null ) {
       var meal = this.grid.cells[ source.y ][ source.x ];
       if ( meal !== undefined ) {

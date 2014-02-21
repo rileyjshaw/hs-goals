@@ -10,7 +10,7 @@
   function Wall () {
     this.currentColor = [];
   }
-  Wall.prototype.color = [ 0, 0, 0 ];
+  Wall.prototype.color = [ 255, 255, 255 ];
   registerCreatureType( Wall, '#' );
 
   function Lichen () {
@@ -18,6 +18,8 @@
     this.currentColor = [];
   }
   Lichen.prototype.color = [ 0, 255, 0 ];
+  Lichen.prototype.maxEnergy = 20;
+
   Lichen.prototype.act = function ( surroundings ) {
     var emptySpace = findDirections( surroundings, ' ' );
     if ( this.energy >= 13 && emptySpace.length > 0 ) {
@@ -39,6 +41,9 @@
     this.currentColor = [];
   }
   LineBug.prototype.color = [ 0, 0, 255 ];
+  LineBug.prototype.maxEnergy = 50;
+  LineBug.prototype.moveCost = -1.5;
+
   LineBug.prototype.act = function ( surroundings ) {
     var emptySpace = findDirections( surroundings, ' ' );
     var lichen = findDirections( surroundings, '*' );
@@ -70,6 +75,8 @@
     this.currentColor = [];
   }
   StupidBug.prototype.color = [ 255, 0, 0 ];
+  StupidBug.prototype.maxEnergy = 50;
+
   StupidBug.prototype.act = function ( surroundings ) {
     var emptySpace = findDirections( surroundings, ' ' );
     var lichen = findDirections( surroundings, '*' );
@@ -98,10 +105,12 @@
 
   // Example of a bug that doesn't depend on standard actions
   function GameOfLifeBug () {
-    this.energy = Math.random() < .5 ? 0 : 1;
+    this.energy = Math.random() < 0.5 ? 0 : 1;
     this.currentColor = [];
   }
   GameOfLifeBug.prototype.color = [ 0, 0, 0 ];
+  GameOfLifeBug.prototype.maxEnergy = 1;
+
   GameOfLifeBug.prototype.act = function( surroundings ) {
     var numNeighbors = 0;
     var neighbors = findDirections( surroundings, this.character ).length;

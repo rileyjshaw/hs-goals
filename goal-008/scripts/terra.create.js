@@ -18,7 +18,7 @@ terra.create = function ( selector, map ) {
     };
 
     requestAnimationFrame( tick );
-  }
+  };
 
   var level = new Terrarium( map, selector );
 

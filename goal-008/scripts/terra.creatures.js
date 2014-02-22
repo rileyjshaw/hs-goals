@@ -115,8 +115,7 @@
   GameOfLifeBug.prototype.act = function( surroundings ) {
     var numNeighbors = 0;
     directions.each( function ( name ) {
-      if ( surroundings[ name ].character === this.character
-          && surroundings[ name ].object.energy === 1 ) {
+      if ( surroundings[ name ].character === this.character && surroundings[ name ].object.energy === 1 ) {
         numNeighbors++;
       }
     });

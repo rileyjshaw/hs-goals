@@ -208,15 +208,9 @@ var terra = terra || {};
     directions.each( function ( name, direction ) {
       var place = center.add( direction );
       if ( grid.isInside( place ) ) {
-        result[ name ] = {
-          character: characterFromElement( grid.cells[ place.y ][ place.x ] ),
-          object: grid.cells[ place.y ][ place.x ]
-        };
+        result = characterFromElement( grid.cells[ place.y ][ place.x ] );
       } else {
-        result[ name ] = {
-          character: '#',
-          object: null
-        };
+        result = '#';
       }
     });
     return result;
@@ -339,7 +333,7 @@ var terra = terra || {};
   function findDirections ( surroundings, wanted ) {
     var found = [];
     directions.each( function ( name ) {
-      if ( surroundings[ name ].character == wanted ) {
+      if ( surroundings[ name ] == wanted ) {
         found.push( name );
       }
     });

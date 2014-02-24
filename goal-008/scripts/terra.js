@@ -36,20 +36,7 @@ var terra = terra || {};
       }
     }
   }
-/*
-    function clone ( object ) {
-    function OneShotConstructor () {}
-    OneShotConstructor.prototype = object;
-    return new OneShotConstructor();
 
-    function Child ( args ) {
-      Parent.call( this, args );
-    }
-    Child.prototype = clone( Parent.prototype );
-    Child.prototype.constructor = Child;
-
-  }
-*/
   function Dictionary ( startValues ) {
     this.values = startValues || {};
   }
@@ -208,7 +195,7 @@ var terra = terra || {};
     directions.each( function ( name, direction ) {
       var place = center.add( direction );
       if ( grid.isInside( place ) ) {
-        result = characterFromElement( grid.cells[ place.y ][ place.x ] );
+        result[ name ] = characterFromElement( grid.cells[ place.y ][ place.x ] );
       } else {
         result = '#';
       }

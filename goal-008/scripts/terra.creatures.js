@@ -48,6 +48,7 @@
   LineBug.prototype.act = function ( surroundings ) {
     var emptySpace = findDirections( surroundings, ' ' ); // FIXME: just needs the one direction
     var lichen = findDirections( surroundings, '*' );
+
     if ( this.energy >= 30 && emptySpace.length > 0 ) {
       return {
         type: 'reproduce',

@@ -25,11 +25,11 @@ gulp.task('lint', function() {
 
 gulp.task('scripts', function() {
   return gulp.src([paths.src.firstScript, paths.src.scripts])
-    .pipe(stripDebug())
+//    .pipe(stripDebug())
     .pipe(concat('all.js'))
     .pipe(gulp.dest('dist'))
     .pipe(rename('all.min.js'))
-    .pipe(uglify())
+//    .pipe(uglify( { outSourceMap: true } ))
     .pipe(gulp.dest('dist'));
 });
 
@@ -37,7 +37,7 @@ gulp.task('sass', function () {
   return gulp.src(paths.src.stylesheets)
     .pipe(sass())
     .pipe(autoprefixer())
-    .pipe(minifyCSS())
+//    .pipe(minifyCSS())
     .pipe(gulp.dest('dist'))
 });
 
@@ -46,4 +46,4 @@ gulp.task('watch', function() {
   gulp.watch(paths.src.stylesheets, ['sass']);
 });
 
-gulp.task('default', ['lint', 'scripts', 'sass', 'watch']);
+gulp.task( 'default', [ 'lint', 'scripts', 'sass', 'watch' ] );

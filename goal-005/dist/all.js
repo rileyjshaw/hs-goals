@@ -136,38 +136,6 @@
       context.fillText( message, 5, 20 );
     };
 
-    clickHandler = function ( event ) {
-      var
-      coords = element.relativeMouseCoords( event ),
-      x = Math.floor( coords.x * 3 / width ),
-      y = Math.floor( coords.y * 3 / height ),
-      index = x + y * 3;
-
-      if ( typeof( game.moves[ index ] ) === 'undefined' ) {
-        var
-        xPixels = width * ( 2 * x + 1 ) / 6;
-        yPixels = height * ( 2 * y + 1 ) / 6;
-
-        if ( game.turn % 2 ) {
-          game.moves[ index ] = 0;
-          drawO( xPixels, yPixels );
-        } else {
-          game.moves[ index ] = 1;
-          drawX( xPixels, yPixels );
-        }
-
-        context.stroke();
-
-        if ( ++game.turn === 9 ) {
-          game.turn = 0;
-          game.moves = [];
-
-          paintBoard();
-        }
-
-      }
-    };
-
     element = createHDCanvas();
     context = element.getContext( '2d' );
 
@@ -183,9 +151,43 @@
     };
   };
 
+  var clickHandler = function ( event, game ) {
+    var
+    coords = game.canvas.element.relativeMouseCoords( event ),
+    x = Math.floor( coords.x * 3 / game.width ),
+    y = Math.floor( coords.y * 3 / game.height ),
+    index = x + y * 3;
+
+    if ( typeof( game.moves[ index ] ) === 'undefined' ) {
+      var
+      xPixels = game.width * ( 2 * x + 1 ) / 6;
+      yPixels = game.height * ( 2 * y + 1 ) / 6;
+
+      if ( game.turn % 2 ) {
+        game.moves[ index ] = 0;
+        game.canvas.drawO( xPixels, yPixels );
+      } else {
+        game.moves[ index ] = 1;
+        game.canvas.drawX( xPixels, yPixels );
+      }
+
+      game.canvas.context.stroke();
+
+      if ( ++game.turn === 9 ) {
+        game.turn = 0;
+        game.moves = [];
+
+        game.canvas.paintBoard();
+      }
+
+    }
+  };
+
   document.addEventListener( 'DOMContentLoaded', function () {
     var game = new Game( 400, 400, 'tictactoe' );
-    game.canvas.element.addEventListener( 'click', game.canvas.clickHandler, false );
+    game.canvas.element.addEventListener( 'click', function ( event ) {
+      clickHandler( event, game );
+    }, false);
   }, false );
 
 

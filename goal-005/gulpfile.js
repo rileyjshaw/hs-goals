@@ -1,58 +1,49 @@
 var
   gulp = require('gulp'),
-  watch = require('gulp-watch'),
   jshint = require('gulp-jshint'),
   stripDebug = require('gulp-strip-debug'),
   concat = require('gulp-concat'),
   uglify = require('gulp-uglify'),
-  rename = require('gulp-rename'),
-  sass = require('gulp-sass'),
+  rename = require('gulp-rename');
+  sass = require('gulp-ruby-sass'),
   autoprefixer = require('gulp-autoprefixer'),
-  minifyCSS = require('gulp-minify-css'),
-  changed = require('gulp-changed'),
-  imagemin = require('gulp-imagemin');
+  minifyCSS = require('gulp-minify-css');
 
 var paths = {
   src: {
-    scripts: 'src/public/scripts/*.js',
-    stylesheets: 'src/public/stylesheets/*.js',
-    images: 'src/public/stylesheets/*.sass'
+    firstScript: 'scripts/plugins.js',
+    scripts: 'scripts/*.js',
+    stylesheets: 'stylesheets/*.sass'
   }
 };
 
 gulp.task('lint', function() {
-  gulp.src(paths.src.scripts)
-    .pipe(watch())
+  return gulp.src(paths.src.scripts)
     .pipe(jshint())
     .pipe(jshint.reporter('default'));
 });
 
 gulp.task('scripts', function() {
-  gulp.src(paths.src.scripts)
-    .pipe(watch())
+  return gulp.src([paths.src.firstScript, paths.src.scripts])
     .pipe(stripDebug())
     .pipe(concat('all.js'))
-    .pipe(gulp.dest('./build/'))
+    .pipe(gulp.dest('dist'))
     .pipe(rename('all.min.js'))
     .pipe(uglify())
-    .pipe(gulp.dest('build/img'));
+    .pipe(gulp.dest('dist'));
 });
 
 gulp.task('sass', function () {
-  gulp.src(paths.src.stylesheets)
-    .pipe(watch())
-    .pipe(sass({ errLogToConsole: true }))
+  return gulp.src(paths.src.stylesheets)
+    .pipe(sass())
     .pipe(autoprefixer())
     .pipe(minifyCSS())
-    .pipe(gulp.dest('./build/'))
+    .pipe(gulp.dest('dist'))
 });
 
-gulp.task('images', function() {
-  gulp.src('src/images/**/*')
-    .pipe(watch())
-    .pipe(changed('build/images'))
-    .pipe(imagemin())
-    .pipe(gulp.dest('./build/'));
+gulp.task('watch', function() {
+  gulp.watch(paths.src.scripts, ['lint', 'scripts']);
+  gulp.watch(paths.src.stylesheets, ['sass']);
 });
 
-gulp.task('default', ['lint', 'sass', 'scripts', 'images']);
+gulp.task('default', ['lint', 'scripts', 'sass', 'watch']);

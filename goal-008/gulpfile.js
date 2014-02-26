@@ -11,7 +11,7 @@ var
 
 var paths = {
   src: {
-    firstScript: 'scripts/terra.js',
+    firstScripts: [ 'scripts/terra.js', 'scripts/terra.util.js' ],
     scripts: 'scripts/*.js',
     stylesheets: 'stylesheets/*.sass'
   }
@@ -24,12 +24,12 @@ gulp.task('lint', function() {
 });
 
 gulp.task('scripts', function() {
-  return gulp.src([paths.src.firstScript, paths.src.scripts])
-//    .pipe(stripDebug())
+  return gulp.src( [ paths.src.firstScripts[0], paths.src.firstScripts[1], paths.src.scripts ] )
+    .pipe(stripDebug())
     .pipe(concat('all.js'))
     .pipe(gulp.dest('dist'))
     .pipe(rename('all.min.js'))
-//    .pipe(uglify( { outSourceMap: true } ))
+    .pipe(uglify( { outSourceMap: true } ))
     .pipe(gulp.dest('dist'));
 });
 
@@ -37,7 +37,7 @@ gulp.task('sass', function () {
   return gulp.src(paths.src.stylesheets)
     .pipe(sass())
     .pipe(autoprefixer())
-//    .pipe(minifyCSS())
+    .pipe(minifyCSS())
     .pipe(gulp.dest('dist'))
 });
 

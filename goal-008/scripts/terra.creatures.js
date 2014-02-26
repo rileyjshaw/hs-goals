@@ -8,14 +8,14 @@
   forEach = terra.util.forEach;
 
   function Wall () {
-    this.currentColor = [];
+    this.currentColor = [ 0, 0, 0 ];
   }
   Wall.prototype.color = [ 0, 0, 0 ];
   registerCreatureType( Wall, '#' );
 
   function Lichen () {
     this.energy = 5;
-    this.currentColor = [];
+    this.currentColor = [ 191, 255, 191 ]; // 5/20
   }
   Lichen.prototype.color = [ 0, 255, 0 ];
   Lichen.prototype.maxEnergy = 20;
@@ -39,7 +39,7 @@
   function LineBug () {
     this.energy = 8;
     this.direction = 'ne';
-    this.currentColor = [];
+    this.currentColor = [ 214, 214, 255 ]; // 8/50
   }
   LineBug.prototype.color = [ 0, 0, 255 ];
   LineBug.prototype.maxEnergy = 50;
@@ -74,7 +74,7 @@
 
   function StupidBug () {
     this.energy = 10;
-    this.currentColor = [];
+    this.currentColor = [ 255, 204, 204 ]; // 10/50
   }
   StupidBug.prototype.color = [ 255, 0, 0 ];
   StupidBug.prototype.maxEnergy = 50;
@@ -108,7 +108,7 @@
   // Example of a bug that doesn't depend on standard actions
   function GameOfLifeBug () {
     this.energy = 1; //Math.random() < 0.5 ? 0 : 1;
-    this.currentColor = [];
+    this.currentColor = [ 0, 0, 0 ]; // 1/1
   }
   GameOfLifeBug.prototype.color = [ 0, 0, 0 ];
   GameOfLifeBug.prototype.maxEnergy = 1;

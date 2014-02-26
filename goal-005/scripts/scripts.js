@@ -1,5 +1,9 @@
 ;(function ( exports ) {
   var Game = function( width, height, id ) {
+    this.winningCombinations = [ [0, 1, 2 ], [ 3, 4, 5 ], [ 6, 7, 8 ], [ 0, 3, 6 ], [ 1, 4, 7 ], [ 2, 5, 8 ], [ 0, 4, 8 ], [ 2, 4, 6 ] ];
+    this.startTime = new Date;
+    this.player = 1;
+
     this.width = width;
     this.height = height;
     this.id = id;
@@ -27,8 +31,7 @@
     var
     createHDCanvas,
     clearCanvas,
-    drawX,
-    drawO,
+    draw,
     paintBoard,
     paintMessage,
     clickHandler,
@@ -98,16 +101,16 @@
       context.clearRect(0, 0, width, height);
     };
 
-    drawX = function ( x, y ) {
-      context.moveTo(x - game.playerRadius, y - game.playerRadius);
-      context.lineTo(x + game.playerRadius, y + game.playerRadius);
-      context.moveTo(x - game.playerRadius, y + game.playerRadius);
-      context.lineTo(x + game.playerRadius, y - game.playerRadius);
-    };
-
-    drawO = function ( x, y ) {
-      context.beginPath();
-      context.arc( x, y, game.playerRadius, 0, 2 * Math.PI );
+    draw = function ( player, x, y ) {
+      if ( player ) { // X
+        context.moveTo(x - game.playerRadius, y - game.playerRadius);
+        context.lineTo(x + game.playerRadius, y + game.playerRadius);
+        context.moveTo(x - game.playerRadius, y + game.playerRadius);
+        context.lineTo(x + game.playerRadius, y - game.playerRadius);
+      } else { // O
+        context.beginPath();
+        context.arc( x, y, game.playerRadius, 0, 2 * Math.PI );
+      }
       context.stroke();
     };
 
@@ -144,8 +147,7 @@
       context: context,
       clearCanvas: clearCanvas,
       clickHandler: clickHandler,
-      drawX: drawX,
-      drawO: drawO,
+      draw: draw,
       paintBoard: paintBoard,
       paintMessage: paintMessage
     };
@@ -156,22 +158,19 @@
     coords = game.canvas.element.relativeMouseCoords( event ),
     x = Math.floor( coords.x * 3 / game.width ),
     y = Math.floor( coords.y * 3 / game.height ),
-    index = x + y * 3;
+    index = x + y * 3,
+    clickTime = new Date;
 
     if ( typeof( game.moves[ index ] ) === 'undefined' ) {
       var
       xPixels = game.width * ( 2 * x + 1 ) / 6;
       yPixels = game.height * ( 2 * y + 1 ) / 6;
 
-      if ( game.turn % 2 ) {
-        game.moves[ index ] = 0;
-        game.canvas.drawO( xPixels, yPixels );
-      } else {
-        game.moves[ index ] = 1;
-        game.canvas.drawX( xPixels, yPixels );
-      }
-
+      game.moves[ index ] = game.player;
+      game.canvas.draw( game.player, xPixels, yPixels );
       game.canvas.context.stroke();
+
+      console.log('Received move "' + game.player + '" at time ' + ( clickTime - game.startTime ) );
 
       if ( ++game.turn === 9 ) {
         game.turn = 0;
@@ -189,7 +188,5 @@
       clickHandler( event, game );
     }, false);
   }, false );
-
-
 
 })( this );
